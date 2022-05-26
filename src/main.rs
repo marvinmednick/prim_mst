@@ -31,7 +31,7 @@ struct Vertex {
 }
 
 #[derive(Debug,Clone,Ord,PartialOrd,Eq,PartialEq)]
-struct Edge {
+pub struct Edge {
     vertex: u32,
     weight: i32
 }
@@ -103,15 +103,13 @@ impl Vertex {
 
 
 #[derive(Debug,Clone)]
-struct Graph {
+pub struct Graph {
 	vertex_map:  BTreeMap::<u32, Vertex>,
 	edge_count:  u32,
 	explored:  HashMap::<u32,bool>,
 	pub finished_order:  Vec::<u32>,
 	pub start_search:  HashMap::<u32,Vec::<u32>>,
 	top_search_cnts:  HashMap::<u32, usize>,
-    pub unprocessed_vertex : MinHeap::<i32>,
-    pub processed_vertex : HashMap::<u32,i32>,
 }
 
 
@@ -125,8 +123,6 @@ impl Graph {
 				finished_order:  Vec::<u32>::new(),
 				start_search : HashMap::<u32,Vec::<u32>>::new(),
 				top_search_cnts : HashMap::<u32,usize>::new(),
-                unprocessed_vertex : MinHeap::<i32>::new(),
-                processed_vertex : HashMap::<u32,i32>::new(),
 		}
 	}
 
@@ -387,11 +383,30 @@ impl Graph {
 
 	}
 
+}
 
-    // dijkstra shortest path
-    pub fn update_scoring(&mut self, id: u32) {
+pub struct Dijkstra {
+    pub unprocessed_vertex : MinHeap::<i32>,
+    pub processed_vertex : HashMap::<u32,i32>,
+}
+            
+
+impl Dijkstra {
+
+    pub fn new() -> Self {
+
+        Dijkstra  {
+            unprocessed_vertex : MinHeap::<i32>::new(),
+            processed_vertex : HashMap::<u32,i32>::new(),
+        }
+    }
+
+
+    // update scoring for dijkstra shortest path
+    
+    pub fn update_scoring(&mut self, graph: &mut Graph, id: u32) {
    //     println!("Dijsktra scoring {}",id);
-        let adj_vertexes = self.get_outgoing(id);
+        let adj_vertexes = graph.get_outgoing(id);
         
         // get the distance/score from the current vertex as the base
         let cur_vertex_distance = self.processed_vertex.get(&id).unwrap().clone();
@@ -411,13 +426,12 @@ impl Graph {
  //                   println!("Unprocessed: {:?}",self.unprocessed_vertex)
                 }
              }       
-                
             
         }
 
     }
 
-    pub fn shortest_paths(&mut self, starting_vertex: u32) {
+    pub fn shortest_paths(&mut self, graph: &mut Graph, starting_vertex: u32) {
         println!("Starting shortest path with {}",starting_vertex);
 
         if let Some(starting_index) = self.unprocessed_vertex.get_id_index(starting_vertex) {
@@ -428,12 +442,12 @@ impl Graph {
             // setup the initial distance for the starting vertex to 0 (to itself)
             self.processed_vertex.insert(starting_vertex,0);
 
-            self.update_scoring(starting_vertex);
+            self.update_scoring(graph,starting_vertex);
 
             while let Some((next_vertex,next_vertex_score)) = self.unprocessed_vertex.get_min_entry() {
  //               println!("Processing vertex {} score: {}",next_vertex,next_vertex_score);
                 self.processed_vertex.insert(next_vertex,next_vertex_score);
-                self.update_scoring(next_vertex);
+                self.update_scoring(graph,next_vertex);
             }
          }       
         else {
@@ -441,10 +455,6 @@ impl Graph {
         }
 
     }
-
-            
-
-    
 
 }
 
@@ -454,8 +464,6 @@ fn main() {
     let cmd_line = CommandArgs::new();
 
     println!("Hello, {:?}!",cmd_line);
-
-
 
     println!("Calulating shortest path from Vertex {} to all other vertexes",cmd_line.start_vertex);
   // Create a path to the desired file
@@ -472,6 +480,7 @@ fn main() {
     let mut reader = BufReader::new(file);
 
 	let mut g = Graph::new();
+	let mut d = Dijkstra::new();
 
     // read the first line
     let mut line = String::new();
@@ -496,15 +505,15 @@ fn main() {
     }
 
     for v in g.vertex_map.keys() {
-        g.unprocessed_vertex.insert(g.vertex_map[v].vertex_id,100000000);
+        d.unprocessed_vertex.insert(g.vertex_map[v].vertex_id,100000000);
     }
 
 
     g.print_vertexes();
-    g.shortest_paths(cmd_line.start_vertex);
+    d.shortest_paths(&mut g,cmd_line.start_vertex);
 
     for v in g.vertex_map.keys() {
-        println!("v {} - {}", v, g.processed_vertex[v]);
+        println!("v {} - {}", v, d.processed_vertex[v]);
     }
 
 }
