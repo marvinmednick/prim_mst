@@ -19,6 +19,12 @@ pub struct Edge {
     pub weight: i32
 }
 
+impl Edge {
+    pub fn new(v : u32, w: i32 ) -> Self {
+        Edge { vertex: v, weight: w }
+    }
+}
+
 impl Vertex {
 
 	pub fn new(id : &u32) -> Vertex {

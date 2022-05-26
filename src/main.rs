@@ -158,22 +158,23 @@ fn main() {
  * cargo test --package rust-template -- --nocapture
  * Note: 'rust-template' comes from Cargo.toml's 'name' key
  */
-/*
+
 // use the attribute below for unit tests
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::graph::Edge;
 
 	fn setup_basic1() -> Graph {
 		let mut g = Graph::new();
-		assert_eq!(g.add_edge(1,2),Some(1));
-		assert_eq!(g.add_edge(1,3),Some(2));
-		assert_eq!(g.add_edge(2,3),Some(1));
-		assert_eq!(g.add_edge(2,4),Some(2));
-		assert_eq!(g.add_edge(3,4),Some(1));
-		assert_eq!(g.get_outgoing(1),&[2,3]);
-		assert_eq!(g.get_outgoing(2),&[3,4]);
-		assert_eq!(g.get_outgoing(3),&[4]);
+		assert_eq!(g.add_edge(1,2,1),Some(1));
+        assert_eq!(g.add_edge(1,3,1),Some(2));
+        assert_eq!(g.add_edge(2,3,1),Some(1));
+        assert_eq!(g.add_edge(2,4,1),Some(2));
+        assert_eq!(g.add_edge(3,4,1),Some(1));
+        assert_eq!(g.get_outgoing(1),&[Edge::new(2,1),Edge::new(3,1)]);
+		assert_eq!(g.get_outgoing(2),&[Edge::new(3,1),Edge::new(4,1)]);
+		assert_eq!(g.get_outgoing(3),&[Edge::new(4,1)]);
 		assert_eq!(g.get_outgoing(4),&[]);
 		g
 	} 
@@ -183,13 +184,13 @@ mod tests {
 		let mut g = Graph::new();
 		assert_eq!(g.create_vertex(&1),Some(1));
 		assert_eq!(g.create_vertex(&2),Some(2));
-		assert_eq!(g.add_edge(1,2),Some(1));
+		assert_eq!(g.add_edge(1,2,1),Some(1));
 		assert_eq!(g.get_vertexes(),vec!(1,2));
 		assert_eq!(g.create_vertex(&3),Some(3));
-		assert_eq!(g.add_edge(1,3),Some(2));
-		assert_eq!(g.add_edge(2,3),Some(1));
+		assert_eq!(g.add_edge(1,3,1),Some(2));
+		assert_eq!(g.add_edge(2,3,1),Some(1));
 		assert_eq!(g.get_vertexes(),vec!(1,2,3));
-		assert_eq!(g.add_edge(1,4),Some(3));
+		assert_eq!(g.add_edge(1,4,1),Some(3));
 		assert_eq!(g.get_vertexes(),vec!(1,2,3,4));
 		println!("{:?}",g);
 
@@ -198,29 +199,28 @@ mod tests {
 	#[test]
 	fn test_add() {
 		let mut g = Graph::new();
-		assert_eq!(g.add_edge(1,2),Some(1));
-		assert_eq!(g.get_outgoing(1),&[2]);
-		assert_eq!(g.get_incoming(2),&[1]);
-		assert_eq!(g.add_edge(1,3),Some(2));
-		assert_eq!(g.get_outgoing(1),&[2,3]);
-		assert_eq!(g.get_incoming(2),&[1]);
+		assert_eq!(g.add_edge(1,2,1),Some(1));
+		assert_eq!(g.get_outgoing(1),&[Edge::new(2,1)]);
+		assert_eq!(g.get_incoming(2),&[Edge::new(1,1)]);
+		assert_eq!(g.add_edge(1,3,1),Some(2));
+		assert_eq!(g.get_outgoing(1),&[Edge::new(2,1),Edge::new(3,1)]);
+		assert_eq!(g.get_incoming(2),&[Edge::new(1,1)]);
 	}
 
 	#[test]
 	fn test_add_del() {
 		let mut g = setup_basic1();
-		assert_eq!(g.get_outgoing(1),&[2,3]);
-		assert_eq!(g.add_edge(1,2),Some(3));
-		assert_eq!(g.get_outgoing(1),&[2,3]);
-		assert_eq!(g.get_outgoing(2),&[3,4]);
-		assert_eq!(g.get_outgoing(3),&[4]);
-		assert_eq!(g.delete_edge(1,2),Ok(()));
-		assert_eq!(g.get_outgoing(1),&[2,3]);
-		assert_eq!(g.delete_edge(1,2),Ok(()));
-		assert_eq!(g.get_outgoing(1),&[3]);
+		assert_eq!(g.get_outgoing(1),&[Edge::new(2,1),Edge::new(3,1)]);
+		assert_eq!(g.add_edge(1,2,1),Some(3));
+		assert_eq!(g.get_outgoing(1),&[Edge::new(2,1),Edge::new(3,1)]);
+		assert_eq!(g.get_outgoing(2),&[Edge::new(3,1),Edge::new(4,1)]);
+		assert_eq!(g.get_outgoing(3),&[Edge::new(4,1)]);
+		assert_eq!(g.delete_edge(1,2,1),Ok(()));
+		assert_eq!(g.get_outgoing(1),&[Edge::new(2,1),Edge::new(3,1)]);
+		assert_eq!(g.delete_edge(1,2,1),Ok(()));
+		assert_eq!(g.get_outgoing(1),&[Edge::new(3,1)]);
 		
 	}
 
 
  }
- */
