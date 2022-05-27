@@ -25,7 +25,7 @@ impl Dijkstra {
     // update scoring for dijkstra shortest path
     
     pub fn update_scoring(&mut self, graph: &mut Graph, id: u32) {
-   //     println!("Dijsktra scoring {}",id);
+   //   get a vector of outgoing edges (vertex, weight..)
         let adj_vertexes = graph.get_outgoing(id);
         
         // get the distance/score from the current vertex as the base

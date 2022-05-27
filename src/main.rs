@@ -1,15 +1,14 @@
 use std::path::Path;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
-use std::collections::{HashMap};
 use regex::Regex;
 
 mod graph;
 use crate::graph::Graph;
 mod cmd_line;
 use crate::cmd_line::CommandArgs;
-mod dijkstra;
-use crate::dijkstra::Dijkstra;
+mod prim;
+use crate::prim::Prim;
 
 
 
@@ -35,7 +34,7 @@ fn main() {
     let mut reader = BufReader::new(file);
 
 	let mut g = Graph::new();
-	let mut d = Dijkstra::new();
+	let mut p = Prim::new();
 
     // read the first line
     let mut line = String::new();
@@ -45,7 +44,7 @@ fn main() {
     for line in reader.lines() {
 		_count += 1;	
 		let line_data = line.unwrap();
-        println!("Processing {}",line_data);
+ //       println!("Processing {}",line_data);
 
         // split the line into the vertex and the list of adjacent vertexes/weight pairs
         let re_vertex = Regex::new(r"\s*(?P<src>\d+)\s+(?P<dest>\d+)\s+(?P<weight>-*\d+).*$").unwrap();
@@ -56,20 +55,25 @@ fn main() {
         let dest_vertex = caps["dest"].parse::<u32>().unwrap(); 
         let weight = caps["weight"].parse::<i32>().unwrap(); 
         g.add_edge(src_vertex,dest_vertex,weight);
-        println!("Added Edge #{}: from {} - {} wgt: {} --  ",_count,src_vertex,dest_vertex,weight);
+        g.add_edge(dest_vertex,src_vertex,weight);
+  //      println!("Added Edge #{}: from {} - {} wgt: {} --  ",_count,src_vertex,dest_vertex,weight);
     }
 
     for v in g.vertex_map.keys() {
-        d.unprocessed_vertex.insert(g.vertex_map[v].vertex_id,100000000);
+        p.unprocessed_vertex.insert(g.vertex_map[v].vertex_id,100000000);
     }
 
+//    println!("At Start");
 
-    g.print_vertexes();
-    d.shortest_paths(&mut g,cmd_line.start_vertex);
+//   g.print_vertexes();
+    p.min_span_tree(&mut g,cmd_line.start_vertex);
 
-    for v in g.vertex_map.keys() {
-        println!("v {} - {}", v, d.processed_vertex[v]);
+    let mut sum = 0;
+    for v in p.processed_vertex {
+        sum += v.1;
+ //       println!("v {:?} sub-total {}",v,sum);
     }
+    println!("Total: {}",sum);
 
 }
 
