@@ -2,6 +2,7 @@ use std::path::Path;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 use regex::Regex;
+use log::{ info , error ,debug, warn,trace };
 
 mod graph;
 use crate::graph::Graph;
@@ -14,12 +15,13 @@ use crate::prim::Prim;
 
 fn main() {
 
+    env_logger::init();
 
     let cmd_line = CommandArgs::new();
 
-    println!("Hello, {:?}!",cmd_line);
+//    println!("Hello, {:?}!",cmd_line);
 
-    println!("Calulating shortest path from Vertex {} to all other vertexes",cmd_line.start_vertex);
+    info!("Calulating shortest path from Vertex {} to all other vertexes",cmd_line.start_vertex);
   // Create a path to the desired file
     let path = Path::new(&cmd_line.filename);
     let display = path.display();
@@ -51,8 +53,8 @@ fn main() {
         // adjacent vertexes are in the format vertex,weight   - and regex below allows for
         // whitespace
         let caps = re_vertex.captures(&line_data).unwrap();
-        let src_vertex = caps["src"].parse::<u32>().unwrap(); 
-        let dest_vertex = caps["dest"].parse::<u32>().unwrap(); 
+        let src_vertex = caps["src"].parse::<usize>().unwrap(); 
+        let dest_vertex = caps["dest"].parse::<usize>().unwrap(); 
         let weight = caps["weight"].parse::<i32>().unwrap(); 
         g.add_edge(src_vertex,dest_vertex,weight);
         g.add_edge(dest_vertex,src_vertex,weight);
@@ -73,7 +75,7 @@ fn main() {
         sum += v.1;
  //       println!("v {:?} sub-total {}",v,sum);
     }
-    println!("Total: {}",sum);
+    println!("{}",sum);
 
 }
 

@@ -2,12 +2,13 @@ use std::collections::{HashMap};
 extern crate minheap;
 use minheap::MinHeap;
 use crate::graph::Graph;
+use log::{info,error};
 
 
 
 pub struct Prim {
     pub unprocessed_vertex : MinHeap::<i32>,
-    pub processed_vertex : HashMap::<u32,i32>,
+    pub processed_vertex : HashMap::<usize,i32>,
 }
             
 
@@ -17,14 +18,14 @@ impl Prim {
 
         Prim  {
             unprocessed_vertex : MinHeap::<i32>::new(),
-            processed_vertex : HashMap::<u32,i32>::new(),
+            processed_vertex : HashMap::<usize,i32>::new(),
         }
     }
 
 
     // update scoring for Prim MST  
     
-    pub fn update_scoring(&mut self, graph: &mut Graph, id: u32) {
+    pub fn update_scoring(&mut self, graph: &mut Graph, id: usize) {
         // get a vector of outgoing edges... (comprised of vertex and weight
         let adj_vertexes = graph.get_outgoing(id);
         
@@ -69,8 +70,8 @@ impl Prim {
 
     }
 
-    pub fn min_span_tree(&mut self, graph: &mut Graph, starting_vertex: u32) {
-        println!("Starting Min Span Tree path with {}",starting_vertex);
+    pub fn min_span_tree(&mut self, graph: &mut Graph, starting_vertex: usize) {
+        info!("Starting Min Span Tree path with {}",starting_vertex);
         //println!("Unprocessed: {:?}",self.unprocessed_vertex);
 
         if let Some(starting_index) = self.unprocessed_vertex.get_id_index(starting_vertex) {
@@ -99,7 +100,7 @@ impl Prim {
             }
          }       
         else {
-            println!("Starting vertex {} is not in the graph",starting_vertex);
+            error!("Starting vertex {} is not in the graph",starting_vertex);
         }
 
     }

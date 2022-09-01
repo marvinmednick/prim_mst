@@ -1,11 +1,12 @@
 extern crate clap;
 
 use clap::{Arg, Command};
+use log::debug;
 
 #[derive(Debug)]
 pub struct CommandArgs  {
     pub filename: String,
-    pub start_vertex: u32,
+    pub start_vertex: usize,
 }
 
 impl CommandArgs  {
@@ -43,14 +44,14 @@ impl CommandArgs  {
         let start = match num_str {
             None => { println!("Start is None..."); 0},
             Some(s) => {
-                match s.parse::<u32>() {
+                match s.parse::<usize>() {
                     Ok(n) => n,
                     Err(_) => {println!("That's not a number! {}", s); 0},
                 }
             }
         };
 
-        println!("clap args: {} {}",filename, start);
+        debug!("clap args: {} {}",filename, start);
 
         CommandArgs { filename: filename.to_string(), start_vertex : start}
     }   
